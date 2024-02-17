@@ -4,11 +4,11 @@
 
 В проект добавлен файл `config.yaml` для настройки приложения
 
-```yaml
+````yaml
 
 ```bash
 cp .env.example .env
-```
+````
 
 ```bash
 docker-compose up --build
