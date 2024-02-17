@@ -6,6 +6,7 @@ import fastapi
 import fastapi.responses
 import fastapi.security
 
+import lib.app.errors as _app_errors
 import lib.app.split_settings as app_split_settings
 import lib.file.services as _file_services
 import lib.models.file as _file_models
@@ -46,7 +47,13 @@ class FilesHandler:
         )
 
     async def get_file(self, file_id: uuid.UUID) -> fastapi.responses.JSONResponse:
-        await self.file_service.get_file(_file_models.FileGetRequest(file_id=file_id))
+        try:
+            await self.file_service.get_file(_file_models.FileGetRequest(file_id=file_id))
+        except _app_errors.FilenameNotFound as e:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Filename not found",
+            ) from e
 
         return fastapi.responses.JSONResponse(
             status_code=fastapi.status.HTTP_200_OK,
