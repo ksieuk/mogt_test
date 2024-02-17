@@ -1,0 +1,13 @@
+api_info:
+  host: localhost
+  port: 8000
+  workers: 2
+
+files_info:
+  api_url: "YOUR_URL"
+  temp_dir: "./temp"
+
+auth_info:
+  basic:
+    username: "interview"
+    password: "interview"
