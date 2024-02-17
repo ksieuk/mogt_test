@@ -1,7 +1,8 @@
-import yaml
 import typing
+
 import pydantic
 import pydantic_settings
+import yaml
 
 import lib.app.split_settings.utils as app_split_settings_utils
 
@@ -16,7 +17,7 @@ class ApiSettings(pydantic_settings.BaseSettings):
 
     host: str = "0.0.0.0"
     port: int = 8000
-    auth_basic_username: str
+    auth_basic_username: str = pydantic.Field(default=...)
     auth_basic_password: pydantic.SecretStr = pydantic.Field(default=...)
     use_config: bool = True
 
