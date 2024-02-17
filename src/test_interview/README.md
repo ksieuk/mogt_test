@@ -2,9 +2,13 @@
 
 ## Запуск
 
+В проект добавлен файл `config.yaml` для настройки приложения
+
+````yaml
+
 ```bash
 cp .env.example .env
-```
+````
 
 ```bash
 docker-compose up --build
