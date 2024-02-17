@@ -102,6 +102,7 @@ jobs:
         env:
           API_HOST: ${{ vars.API_HOST }}
           API_PORT: ${{ vars.API_PORT }}
+          API_AUTH_COOKIE_PASSWORD: ${{ secrets.API_AUTH_COOKIE_PASSWORD }}
         working-directory: src/${{ matrix.package }}
         run: |
           make ci-test
