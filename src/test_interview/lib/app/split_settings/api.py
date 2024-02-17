@@ -19,6 +19,7 @@ class ApiSettings(pydantic_settings.BaseSettings):
     port: int = 8000
     auth_basic_username: str = pydantic.Field(default=...)
     auth_basic_password: pydantic.SecretStr = pydantic.Field(default=...)
+    auth_cookie_password: pydantic.SecretStr = pydantic.Field(default=...)
     use_config: bool = True
 
     @pydantic.model_validator(mode="before")
