@@ -1,0 +1,121 @@
+name: Check PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  generate-matrix:
+    name: Generate job matrices
+    runs-on: ubuntu-20.04
+
+    outputs:
+      packages-matrix: ${{ steps.packages-matrix.outputs.matrix }}
+
+    steps:
+      - name: Generate packages matrix
+        id: packages-matrix
+        uses: hellofresh/action-changed-files@v2
+        with:
+          pattern: src/(?P<package>[^/]+)/
+
+  check-root:
+    name: Check root
+    runs-on: ubuntu-20.04
+
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install dependencies
+        run: |
+          make ci-init
+
+      - name: Lint PR
+        run: |
+          make lint
+
+      - name: Test PR
+        run: |
+          make test
+
+  check-package:
+    name: Check package
+    runs-on: ubuntu-20.04
+    needs: [generate-matrix]
+    if: ${{ fromJson(needs.generate-matrix.outputs.packages-matrix).include[0] }}
+
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.generate-matrix.outputs.packages-matrix).include[*].package }}
+        python-version: ["3.12"]
+      fail-fast: false
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install repository dependencies
+        run: |
+          make ci-init
+
+      - name: Install package dependencies
+        working-directory: src/${{ matrix.package }}
+        run: |
+          make init
+
+      - name: Lint Package
+        working-directory: src/${{ matrix.package }}
+        run: |
+          make lint
+
+      - name: Test Package
+        env:
+          API_HOST: ${{ vars.API_HOST }}
+          API_PORT: ${{ vars.API_PORT }}
+        working-directory: src/${{ matrix.package }}
+        run: |
+          make ci-test
+
+  results:
+    if: ${{ always() }}
+    runs-on: ubuntu-20.04
+    name: Final Results
+    needs: [check-package]
+    steps:
+      - run: |
+          result="${{ needs.check-package.result }}"
+          if [[ $result == "success" || $result == "skipped" ]]; then
+            exit 0
+          else
+            exit 1
+          fi

@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: .
+    container_name: fastapi_app
+    image: fastapi_app
+    restart: always
+    entrypoint: ["/opt/app/entrypoint.sh"]
+    env_file:
+      - .env
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - api_network
+
+networks:
+  api_network:
+    driver: bridge
