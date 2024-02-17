@@ -87,3 +87,17 @@ clean:
 dependencies-update:
 	@echo 'Updating python dependencies...'
 	@poetry update
+
+
+# CI-specific
+
+.PHONY: ci-test
+ci-test:
+	@echo 'Running tests...'
+	@$(PYTHON) -m pytest tests
+
+
+.PHONY: ci-package-build
+ci-package-build:
+	@echo 'Building package...'
+	@poetry build --no-interaction
