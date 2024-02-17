@@ -27,10 +27,15 @@ class ServiceError(ApplicationError):
     pass
 
 
+class FilenameNotFound(ServiceError):
+    pass
+
+
 __all__ = [
     "ApplicationError",
     "ClientError",
     "DisposeError",
+    "FilenameNotFound",
     "RepositoryError",
     "ServiceError",
     "StartServerError",
