@@ -11,6 +11,8 @@ import lib.api.v1.handlers as api_v1_handlers
 import lib.app.errors as app_errors
 import lib.app.settings as app_settings
 import lib.app.split_settings as app_split_settings
+import lib.clients as clients
+import lib.file.services as file_services
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +51,15 @@ class Application:
         # Clients
         logger.info("Initializing clients")
 
+        http_client = clients.AsyncHttpClient(settings.proxy)
+
         # Repositories
         logger.info("Initializing repositories")
 
         # Caches
         logger.info("Initializing caches")
+
+        file_service = file_services.FileService(settings.file, http_client)
 
         # Services
         logger.info("Initializing services")
@@ -61,6 +67,7 @@ class Application:
         # Handlers
         logger.info("Initializing handlers")
         liveness_probe_handler = api_v1_handlers.health_router
+        files_handler = api_v1_handlers.FilesHandler(settings.api, file_service).router
 
         logger.info("Creating application")
 
@@ -74,6 +81,7 @@ class Application:
 
         # Routes
         fastapi_app.include_router(liveness_probe_handler, prefix="/api/v1/health", tags=["health"])
+        fastapi_app.include_router(files_handler, prefix="/api/v1/files", tags=["files"])
         fastapi_app.add_exception_handler(pydantic.ValidationError, api_v1_handlers.value_error_exception_handler)
 
         application = Application(
