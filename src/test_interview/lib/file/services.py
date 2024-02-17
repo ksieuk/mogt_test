@@ -25,7 +25,7 @@ class FileService:
         headers = response.headers
         filename_raw = headers.get("filename")
         if filename_raw is None:
-            raise _app_errors.ServiceError("Filename not found")
+            raise _app_errors.FilenameNotFound("Filename not found")
 
         filename_encoded = urllib.parse.unquote(filename_raw)
         file_path = self.settings.files_dir_path / filename_encoded
