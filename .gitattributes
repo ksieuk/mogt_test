@@ -1,0 +1,2 @@
+src/media_analyzer/lib/markup/repositories/models/education_topic.ckpt filter=lfs diff=lfs merge=lfs -text
+src/media_analyzer/lib/markup/repositories/models/social_dem_topic.ckpt filter=lfs diff=lfs merge=lfs -text
